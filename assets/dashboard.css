@@ -213,21 +213,63 @@
             margin: 0;
         }
         
-        .last-update {
-            display: flex;
-            align-items: center;
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-        
-        .last-update i {
-            margin-right: 0.5rem;
-            color: var(--primary-color);
-        }
-        
         /* Main Content */
         .main-content {
             padding: 1.5rem;
+        }
+        
+        /* Alert Styling */
+        .water-alert {
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            animation: slideInDown 0.5s ease-out;
+            border: none;
+            box-shadow: var(--box-shadow);
+        }
+        
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .water-alert .alert-icon {
+            font-size: 1.8rem;
+            margin-right: 1rem;
+        }
+        
+        .water-alert .alert-content {
+            flex: 1;
+        }
+        
+        .water-alert .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .water-alert .alert-message {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+        }
+        
+        .water-alert .alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        
+        .water-alert .alert-close:hover {
+            opacity: 1;
         }
         
         /* Cards Styling */
@@ -496,6 +538,16 @@
             .chart-actions {
                 width: 100%;
                 justify-content: space-between;
+            }
+            
+            .water-alert {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .water-alert .alert-icon {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
             }
         }
         
