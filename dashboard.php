@@ -11,6 +11,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 // Tambahkan variabel username untuk ditampilkan (Opsional)
 $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username']) : 'Admin';
+
+// Tambahkan variabel untuk menyimpan status alert
+$show_water_change_alert = false;
+$alert_message = '';
+$alert_type = 'warning'; // warning, danger, success, info
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +28,6 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/dashboard.css">
-    <link rel="icon" href="assets/aquarium.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -51,7 +55,7 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     </a>
                 </div>
                 
-                <!-- Logout Section - Tetap di dalam sidebar nav -->
+                <!-- Logout Section -->
                 <div class="nav-item mt-auto">
                     <div class="sidebar-footer">
                         <div class="user-info">
@@ -93,6 +97,24 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
             
             <!-- Main Content -->
             <div class="main-content">
+                <!-- Water Change Alert (akan muncul jika kualitas buruk) -->
+                <div id="waterChangeAlert" class="water-alert alert alert-danger d-none fade-in">
+                    <div class="d-flex align-items-center">
+                        <div class="alert-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">⚠️ PERINGATAN: Kualitas Air Buruk!</div>
+                            <div class="alert-message" id="alertMessage">
+                                Kualitas air akuarium dalam kondisi buruk. Disarankan untuk segera mengganti air akuarium untuk menjaga kesehatan ikan.
+                            </div>
+                        </div>
+                        <button class="alert-close" id="closeAlert">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- Stats Cards Row -->
                 <div class="row fade-in">
                     <!-- TDS Card -->
@@ -155,10 +177,36 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                         <h3 class="chart-title">Grafik Data Historis (10 Data Terakhir)</h3>
                         <div class="chart-actions">
                             <button class="chart-action-btn active">Hari Ini</button>
+                            <button class="chart-action-btn">Minggu Ini</button>
+                            <button class="chart-action-btn">Bulan Ini</button>
                         </div>
                     </div>
                     <div class="chart-area">
                         <canvas id="realtimeChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Water Change Instructions (hidden by default) -->
+                <div id="waterChangeInstructions" class="mt-4 d-none">
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Panduan Penggantian Air Akuarium</h5>
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                <li>Matikan semua peralatan listrik (filter, heater, dll)</li>
+                                <li>Siapkan air baru yang sudah diendapkan minimal 24 jam</li>
+                                <li>Hilangkan klorin dengan dechlorinator jika diperlukan</li>
+                                <li>Ganti 20-30% air akuarium secara bertahap</li>
+                                <li>Jaga suhu air baru mendekati suhu akuarium</li>
+                                <li>Nyalakan kembali peralatan setelah penggantian</li>
+                                <li>Pantau kondisi ikan setelah penggantian air</li>
+                            </ol>
+                            <div class="alert alert-warning mt-2">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Jangan mengganti lebih dari 50% air sekaligus untuk menghindari stres pada ikan.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -167,5 +215,6 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script/dashboard.js"></script>
+   
 </body>
 </html>

@@ -1,4 +1,4 @@
-  // ===============================================
+        // ===============================================
         // 1. Sidebar Toggle
         // ===============================================
         document.getElementById('navToggle').addEventListener('click', function() {
@@ -165,22 +165,27 @@
                         statusText = 'SANGAT BAIK';
                         statusClass = 'bg-status-excellent';
                         qualityProgress.className = 'progress-bar bg-status-excellent';
+                        hideWaterAlert(); // Sembunyikan alert jika kualitas baik
                     } else if (kualitasScore >= 60) {
                         statusText = 'BAIK';
                         statusClass = 'bg-status-good';
                         qualityProgress.className = 'progress-bar bg-status-good';
+                        hideWaterAlert(); // Sembunyikan alert jika kualitas baik
                     } else if (kualitasScore >= 40) {
                         statusText = 'CUKUP';
                         statusClass = 'bg-status-fair';
                         qualityProgress.className = 'progress-bar bg-status-fair';
+                        hideWaterAlert(); // Sembunyikan alert jika kualitas cukup
                     } else if (kualitasScore >= 20) {
                         statusText = 'BURUK';
                         statusClass = 'bg-status-poor';
                         qualityProgress.className = 'progress-bar bg-status-poor';
+                        showWaterAlert('BURUK'); // Tampilkan alert untuk kualitas buruk
                     } else {
                         statusText = 'SANGAT BURUK';
                         statusClass = 'bg-dark';
                         qualityProgress.className = 'progress-bar bg-dark';
+                        showWaterAlert('SANGAT BURUK'); // Tampilkan alert untuk kualitas sangat buruk
                     }
 
                     // Terapkan Status
@@ -206,7 +211,77 @@
         }
 
         // ===============================================
-        // 4. Main Execution
+        // 4. Water Change Alert Functions
+        // ===============================================
+        
+        function showWaterAlert(qualityStatus) {
+            const alertElement = document.getElementById('waterChangeAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            const instructionsElement = document.getElementById('waterChangeInstructions');
+            
+            // Customize alert message based on quality status
+            if (qualityStatus === 'SANGAT BURUK') {
+                alertElement.className = 'water-alert alert alert-danger fade-in';
+                alertMessage.innerHTML = `
+                    <strong>🚨 KONDISI DARURAT!</strong> Kualitas air akuarium dalam kondisi SANGAT BURUK (skor: <span id="currentScore"></span>/100). 
+                    <strong>GANTI AIR SEGERA!</strong> Kondisi ini dapat membahayakan kesehatan ikan dalam waktu singkat.
+                `;
+            } else {
+                alertElement.className = 'water-alert alert alert-warning fade-in';
+                alertMessage.innerHTML = `
+                    <strong>⚠️ PERINGATAN:</strong> Kualitas air akuarium dalam kondisi BURUK (skor: <span id="currentScore"></span>/100). 
+                    Disarankan untuk mengganti 30-50% air akuarium dalam 24 jam ke depan untuk menjaga kesehatan ikan.
+                `;
+            }
+            
+            // Update current score in alert
+            const currentScore = document.getElementById('cardKualitasScore').innerText;
+            document.querySelector('#alertMessage span#currentScore').textContent = currentScore;
+            
+            // Show alert and instructions
+            alertElement.classList.remove('d-none');
+            instructionsElement.classList.remove('d-none');
+            
+            // Add animation
+            alertElement.style.animation = 'slideInDown 0.5s ease-out';
+            
+            // Play notification sound (optional)
+            playAlertSound();
+        }
+        
+        function hideWaterAlert() {
+            const alertElement = document.getElementById('waterChangeAlert');
+            const instructionsElement = document.getElementById('waterChangeInstructions');
+            
+            alertElement.classList.add('d-none');
+            instructionsElement.classList.add('d-none');
+        }
+        
+        function playAlertSound() {
+            // Create a simple notification sound
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio context not supported');
+            }
+        }
+
+        // ===============================================
+        // 5. Main Execution
         // ===============================================
 
         // Panggil fungsi saat halaman dimuat
@@ -218,7 +293,7 @@
         setInterval(updateChartData, 15000); 
 
         // ===============================================
-        // 5. Konfirmasi Logout
+        // 6. Konfirmasi Logout
         // ===============================================
         document.getElementById('logoutBtn').addEventListener('click', function() {
             const konfirmasi = confirm('Apakah Anda yakin ingin keluar dari sistem?');
@@ -229,7 +304,7 @@
         });
 
         // ===============================================
-        // 6. Chart Period Toggle
+        // 7. Chart Period Toggle
         // ===============================================
         document.querySelectorAll('.chart-action-btn').forEach(button => {
             button.addEventListener('click', function() {
@@ -242,7 +317,27 @@
                 this.classList.add('active');
                 
                 // Here you would typically fetch new data based on the selected period
-                // For now, we'll just log the selection
                 console.log('Selected period:', this.textContent);
             });
         });
+
+        // ===============================================
+        // 8. Close Alert Button
+        // ===============================================
+        document.getElementById('closeAlert').addEventListener('click', function() {
+            hideWaterAlert();
+        });
+
+        // ===============================================
+        // 9. Auto-hide alert after 30 seconds
+        // ===============================================
+        setInterval(() => {
+            const alertElement = document.getElementById('waterChangeAlert');
+            if (!alertElement.classList.contains('d-none')) {
+                // Add fade out animation
+                alertElement.style.animation = 'fadeOut 0.5s ease-out';
+                setTimeout(() => {
+                    hideWaterAlert();
+                }, 500);
+            }
+        }, 30000); // 30 seconds
